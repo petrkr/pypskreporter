@@ -8,8 +8,8 @@ class RemoteInfo:
         self._snr = snr
         self._grid = grid
         self._latlng = latlng
-        self._qso_date = qso_date or time()
-        self._time_on = time_on or time()
+        self._qso_date = int(qso_date or time())
+        self._time_on = int(time_on or time())
 
 
     def __str__(self):
