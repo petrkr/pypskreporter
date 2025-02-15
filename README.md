@@ -27,7 +27,7 @@ Library to send data to  PSKReporter
   - `00 03` - Option template set
   - `00 24` - Length of set including in bytes
 - `99 92 00 03 00 01` - Option record set
-  - `99 92` - Template ID (ReceiverCallsign)
+  - `99 92` - Template ID (Receiver template)
   - `00 03` - There are 3 fields
   - `00 01` - Scope 1
 
@@ -44,6 +44,11 @@ Library to send data to  PSKReporter
   - `FF FF` - Field has variable Length
   - `00 00 76 8F` - Enterprise ID 30351
 - `00 00` - padding
+
+
+### Templates
+- `99 92` - Receiver template
+- `99 93` - Sender template
 
 
 ### Fields
