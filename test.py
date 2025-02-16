@@ -5,6 +5,8 @@ from pskreporter.remoteinfo import RemoteInfo
 from pskreporter.localinfo import LocalInfo
 
 from pskreporter.ipfix import OptionsTemplateField, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
+from struct import pack
+
 
 def send_psk_report(ipfx_message):
     """
@@ -74,14 +76,21 @@ def main():
     record2 = DataRecord()
     record2.add_value("TESTCALL-2")
     record2.add_value("JO70QM")
-    record2.add_value(-27)
+    record2.add_value(pack("!b", -15))
+
+    record3 = DataRecord()
+    record3.add_value("TESTCALL-3")
+    record3.add_value("JO70FC")
+    record3.add_value(pack("!b", -2))
 
     print(f"Record 1: {record1.record}")
     print(f"Record 2: {record2.record}")
+    print(f"Record 3: {record3.record}")
 
     # Add records to dataset
     dataset1.add_record(record1)
     dataset2.add_record(record2)
+    dataset2.add_record(record3)
 
     print (f"Record Data set: {dataset1.data}")
     print (f"Record Data set: {dataset2.data}")
