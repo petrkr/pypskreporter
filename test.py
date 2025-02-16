@@ -41,6 +41,7 @@ def main():
     field_sendercall = OptionsTemplateField(PSKReporter.SENDER_CALLSIGN, 0xFFFF, 0x0000768F)
     field_sendergrid = OptionsTemplateField(PSKReporter.SENDER_LOCATOR, 0xFFFF, 0x0000768F)
     field_snr = OptionsTemplateField(PSKReporter.SNR, 0xFFFF, 0x0000768F)
+    field_imd = OptionsTemplateField(PSKReporter.IMD, 0xFFFF, 0x0000768F)
     field_time = OptionsTemplateField(150, 4)
 
     print(f"Receivercall field: {field_receivercall.header}")
@@ -49,7 +50,8 @@ def main():
 
     print(f"Sendercall field: {field_sendercall.header}")
     print(f"Sendergrid field: {field_sendergrid.header}")
-    print(f"Sendergrid field: {field_snr.header}")
+    print(f"iMD field: {field_imd.header}")
+    print(f"sNR field: {field_snr.header}")
     print(f"Time field: {field_time.header}")
 
     # Define template based on fields
@@ -62,6 +64,7 @@ def main():
     template2 = OptionsTemplateRecord(PSKReporter.SENDER_ID)
     template2.add_field(field_sendercall)
     template2.add_field(field_sendergrid)
+    template2.add_field(field_imd)
     template2.add_field(field_snr)
     template2.add_field(field_time)
 
@@ -78,17 +81,19 @@ def main():
     record1.add_value("TESTCALL-1")
     record1.add_value() # Empty field
     #record1.add_value("JO70FC")
-    record1.add_value("PyPSK Reporter v0.0.1")
+    record1.add_value("PyPSKReporter v0.0.1")
 
     record2 = DataRecord()
     record2.add_value("TESTCALL-2")
     record2.add_value("JO70QM")
+    record2.add_value(pack("!b", 15))
     record2.add_value(pack("!b", -15))
     record2.add_value(pack("!I", int(time())), False)
 
     record3 = DataRecord()
-    record3.add_value("TESTCALL-3")
+    record3.add_value("TESTCALL-31")
     record3.add_value("JO70FC")
+    record3.add_value(pack("!b", 2))
     record3.add_value(pack("!b", -2))
     record3.add_value(pack("!I", int(time())), False)
 
@@ -101,8 +106,8 @@ def main():
     dataset2.add_record(record2)
     dataset2.add_record(record3)
 
-    print (f"Record Data set: {dataset1.data}")
-    print (f"Record Data set: {dataset2.data}")
+    print (f"Record Data set ({len(dataset1.data)}): {dataset1.data}")
+    print (f"Record Data set ({len(dataset2.data)}): {dataset2.data}")
 
     payload = IPFIX()
 
