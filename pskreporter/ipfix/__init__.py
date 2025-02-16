@@ -14,16 +14,14 @@ class DataRecord:
     def add_value(self, value, dynamic_length = True):
         record = b''
 
-        if not dynamic_length:
-            raise NotImplementedError("Only dynamic length record is supported for now")
-
         if type(value) == str:
             value = value.encode("UTF-8")
 
-        if len(value) < 255:
-            record += pack("!B", len(value))
-        else:
-            record += pack("!BH", 0xFF, len(value))
+        if dynamic_length:
+            if len(value) < 255:
+                record += pack("!B", len(value))
+            else:
+                record += pack("!BH", 0xFF, len(value))
 
         record += value
         self._records += record
