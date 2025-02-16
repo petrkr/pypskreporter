@@ -89,7 +89,10 @@ class OptionsTemplateRecord:
         self._fieldsnum = 0
 
         # Size of header + size of record set
-        self._length = 10
+        self._length = 8
+
+        if scope is not None:
+            self._length += 2
 
         for field in [f.header for f in templateFields]:
             print(f"Add field {len(field)}")
@@ -109,14 +112,18 @@ class OptionsTemplateRecord:
     def _generate_header(self):
         length = self._length
 
-        padding = b'\x00' * 2
-        length += 2
+        padding = b'\x00' * (-1 * self._length % 4)
+        length += len(padding)
 
         # Header
-        record = pack("!HH", IPFIX_SETID_OPTIONS_TEMPLATE_RECORD, length)
+        record = pack("!HH", IPFIX_SETID_TEMPLATE_RECORD if self._scope is None else IPFIX_SETID_OPTIONS_TEMPLATE_RECORD, length)
 
-        # Options template header
-        record += pack("!HHH", self._templateId, self._fieldsnum, self._scope)
+        # Template Record
+        record += pack("!HH", self._templateId, self._fieldsnum)
+
+        # Options Template Record
+        if self._scope is not None:
+            record += pack("!H", self._scope)
 
         # Fields
         record += self._fieldsdata
@@ -130,6 +137,11 @@ class OptionsTemplateRecord:
     @property
     def data(self):
         return self._generate_header()
+
+
+class TemplateRecord(OptionsTemplateRecord):
+    def __init__(self, templateId, templateFields = []):
+        super().__init__(templateId, templateFields, None)
 
 
 class IPFIXHeader:
