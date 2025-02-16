@@ -1,6 +1,6 @@
 import struct
 import socket
-from pskreporter.ipfix import IPFIX, FieldSpecifierFormat
+from pskreporter.ipfix import IPFIX, FieldSpecifierFormat, OptionsTemplateRecord, TemplateRecord
 
 class PSKReporter:
     PSK_REPORTER_SERVER = "report.pskreporter.info"
@@ -26,10 +26,29 @@ class PSKReporter:
     PERSISTENT_IDENTIFIER = 0x800C
     RIG_INFO = 0x800D
 
+    # Generic Information Elements
+    TIME = 0x96
+
 
     def __init__(self, server = PSK_REPORTER_SERVER, port = PSK_REPORTER_PORT):
         self._server = server
         self._port = port
+
+        # Define base templates
+        self._receiverDataSet = OptionsTemplateRecord(PSKReporter.RECEIVER_ID)
+        self._senderDataSet = TemplateRecord(PSKReporter.SENDER_ID)
+
+        # Define mandatory receiver fields
+        self._receiverDataSet.add_field(FieldSpecifierFormat(PSKReporter.RECEIVER_CALLSIGN, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+        self._receiverDataSet.add_field(FieldSpecifierFormat(PSKReporter.RECEIVER_LOCATOR, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+        self._receiverDataSet.add_field(FieldSpecifierFormat(PSKReporter.DECODER_SOFTWARE, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+
+        # Define mandatory sender fields
+        self._senderDataSet.add_field(FieldSpecifierFormat(PSKReporter.SENDER_CALLSIGN, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+        self._senderDataSet.add_field(FieldSpecifierFormat(PSKReporter.MODE, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+        self._senderDataSet.add_field(FieldSpecifierFormat(PSKReporter.INFORMATION_SOURCE, 0xFFFF, PSKReporter.ENTERPRISE_ID))
+        self._senderDataSet.add_field(FieldSpecifierFormat(PSKReporter.TIME, 4))
+
         self._reportQueue = []
 
 
