@@ -1,5 +1,6 @@
 import struct
 import socket
+from pskreporter.ipfix import IPFIX, OptionsTemplateField
 
 class PSKReporter:
     PSK_REPORTER_SERVER = "report.pskreporter.info"
@@ -40,11 +41,18 @@ class PSKReporter:
         return self.__str__()
 
 
+    # Method which corespond with DLL
     def reporter_seen_callsign(self, remoteInfo, localInfo):
         print(remoteInfo)
         print(localInfo)
 
         self._reportQueue.append((remoteInfo, localInfo))
+
+
+    def _ipfix_receiver_callsign(self, callsign):
+        field = OptionsTemplateField(RECEIVER_CALLSIGN, 0xFFFF, ENTERPRISE_ID, callsign)
+
+        return field
 
 
     def _send_psk_report(self):
