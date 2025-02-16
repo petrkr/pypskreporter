@@ -68,12 +68,6 @@ class PSKReporter:
         self._reportQueue.append((remoteInfo, localInfo))
 
 
-    def _ipfix_receiver_callsign(self):
-        field = OptionsTemplateField(self.RECEIVER_CALLSIGN, 0xFFFF, self.ENTERPRISE_ID)
-
-        return field
-
-
     def _send_psk_report(self):
         """
         Sends a reception reports to PSK Reporter.
