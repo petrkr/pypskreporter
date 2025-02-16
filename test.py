@@ -4,7 +4,7 @@ from pskreporter import PSKReporter
 from pskreporter.remoteinfo import RemoteInfo
 from pskreporter.localinfo import LocalInfo
 
-from pskreporter.ipfix import FieldSpecifierFormat, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
+from pskreporter.ipfix import FieldSpecifierFormat, TemplateRecord, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
 from struct import pack
 
 from time import time
@@ -61,7 +61,7 @@ def main():
     template1.add_field(field_decodersw)
 
     # Define template based on fields
-    template2 = OptionsTemplateRecord(PSKReporter.SENDER_ID)
+    template2 = TemplateRecord(PSKReporter.SENDER_ID)
     template2.add_field(field_sendercall)
     template2.add_field(field_sendergrid)
     template2.add_field(field_imd)
