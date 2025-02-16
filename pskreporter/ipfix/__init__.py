@@ -28,10 +28,14 @@ class OptionsTemplateField:
 
 
 class OptionsTemplateRecord():
-    def __init__(self, templateId, templateFields, scope = 1):
+    def __init__(self, templateId, templateFields = [], scope = 1):
         self._templateId = templateId
         self._fields = templateFields
         self._scope = scope
+
+
+    def add_field(self, field):
+        self._fields.append(field)
 
 
     def _generate_header(self):

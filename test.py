@@ -24,7 +24,8 @@ def main():
     print(field2.header)
     print(field2.data)
 
-    record = OptionsTemplateRecord(0x9992, [field1, field2])
+    record = OptionsTemplateRecord(0x9992, [field1])
+    record.add_field(field2)
 
     print(record.header)
     print(record.data)
