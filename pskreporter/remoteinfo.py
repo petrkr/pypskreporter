@@ -1,10 +1,10 @@
 from time import time
 
 class RemoteInfo:
-    def __init__(self, callsign, freq, mode, snr, grid = None, latlng = None, qso_date = None, time_on = None):
+    def __init__(self, callsign, mode, freq = None, snr = None, grid = None, latlng = None, qso_date = None, time_on = None):
         self._callsign = callsign
-        self._freq = freq
         self._mode = mode
+        self._freq = freq
         self._snr = snr
         self._grid = grid
         self._latlng = latlng
