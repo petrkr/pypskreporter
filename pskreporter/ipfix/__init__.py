@@ -154,14 +154,15 @@ class IPFIXHeader:
 
     def _generate_header(self):
         # Version number + Length + Export time + Seq + Observ
-        self._length += 16 # Version number
+        length = self._length + 16
+
         exporttime = self._time
 
         if not exporttime:
             exporttime = time()
 
         # Header
-        record = pack("!HHIII", IPFIX_MESSAGE_VERSION, self._length, int(exporttime), self._seq, self._obid)
+        record = pack("!HHIII", IPFIX_MESSAGE_VERSION, length, int(exporttime), self._seq, self._obid)
 
         return record
 
