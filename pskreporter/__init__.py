@@ -32,6 +32,14 @@ class PSKReporter:
         self._reportQueue = []
 
 
+    def __str__(self):
+        return f"PSKReporter(server={self._server}, port={self._port})"
+
+
+    def __repr__(self):
+        return self.__str__()
+
+
     def reporter_seen_callsign(self, remoteInfo, localInfo):
         print(remoteInfo)
         print(localInfo)
