@@ -1,8 +1,21 @@
+import socket
+
 from pskreporter import PSKReporter
 from pskreporter.remoteinfo import RemoteInfo
 from pskreporter.localinfo import LocalInfo
 
-from pskreporter.ipfix import OptionsTemplateField, OptionsTemplateRecord
+from pskreporter.ipfix import OptionsTemplateField, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
+
+def send_psk_report(ipfx_message):
+    """
+    Sends a reception report to PSK Reporter.
+    """
+
+    server_address = ('report.pskreporter.info', 14739)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(ipfx_message, server_address)
+    sock.close()
+
 
 def main():
     remote = RemoteInfo("OK1PKR-REMOTE", 14095, "FREEDV", -3, "JO70FC")
@@ -16,20 +29,52 @@ def main():
 
     pskr.reporter_seen_callsign(remote, local)
 
-    field1 = OptionsTemplateField(0x8001, 0xFFFF, 0x0000768F, "OK1PKR-SND".encode("UTF-8"))
-    field2 = OptionsTemplateField(0x8002, 0xFFFF, 0x0000768F, "OK1PKR-RCV".encode("UTF-8"))
-    print(field1.header)
-    print(field1.data)
+    # Define template fields
+    field_receivercall = OptionsTemplateField(0x8002, 0xFFFF, 0x0000768F)
+    field_receivergrid = OptionsTemplateField(0x8004, 0xFFFF, 0x0000768F)
 
-    print(field2.header)
-    print(field2.data)
+    print(f"Receivercall field: {field_receivercall.header}")
+    print(f"Receivergrid field: {field_receivergrid.header}")
 
-    record = OptionsTemplateRecord(0x9992, [field1])
-    record.add_field(field2)
+    # Define template based on fields
+    template = OptionsTemplateRecord(0x9992, [field_receivercall])
+    template.add_field(field_receivergrid)
 
-    print(record.header)
-    print(record.data)
+    print(f"Template record: {template.data}")
 
+    # Add values to template 0x9992
+    dataset = DataRecordSet(0x9992)
+
+    # Create one data record
+    record1 = DataRecord()
+    record1.add_value("TESTCALL-1")
+    record1.add_value("JO70FC")
+
+    record2 = DataRecord()
+    record2.add_value("TESTCALL-2")
+    record2.add_value("JO70QM")
+
+    print(f"Record 1: {record1.record}")
+    print(f"Record 2: {record2.record}")
+
+    # Add records to dataset
+    dataset.add_record(record1)
+    dataset.add_record(record2)
+
+    print (f"Record Data set: {dataset.data}")
+
+    payload = IPFIX()
+
+    # Add field template
+    payload.add_set(template)
+
+    # Add data for this tempalte
+    payload.add_set(dataset)
+
+    # whole IPFix packet
+    print(f"Whole IPFIX packet ({len(payload.data)}): {payload.data}")
+
+    send_psk_report(payload.data)
 
 if __name__ == "__main__":
     main()
