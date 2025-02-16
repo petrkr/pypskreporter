@@ -166,15 +166,18 @@ class IPFIXHeader:
 
         return record
 
+
     @property
     def data(self):
         return self._generate_header()
 
 
 class IPFIX:
-    def __init__(self):
+    def __init__(self, sequence = 0, observation = 0):
         self._header = None
         self._sets = []
+        self._seq = sequence
+        self._obid = observation
 
 
     def add_set(self, setrecord):
@@ -190,6 +193,6 @@ class IPFIX:
             length += len(s.data)
             data += s.data
 
-        header = IPFIXHeader(length).data
+        header = IPFIXHeader(length, self._seq, self._obid).data
 
         return header + data
