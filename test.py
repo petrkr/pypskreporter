@@ -18,11 +18,11 @@ def main():
 
     field1 = OptionsTemplateField(0x8001, 0xFFFF, 0x0000768F, "OK1PKR-SND".encode("UTF-8"))
     field2 = OptionsTemplateField(0x8002, 0xFFFF, 0x0000768F, "OK1PKR-RCV".encode("UTF-8"))
-    print(field1.get_header())
-    print(field1.get_data())
+    print(field1.header)
+    print(field1.data)
 
-    print(field2.get_header())
-    print(field2.get_data())
+    print(field2.header)
+    print(field2.data)
 
     record = OptionsTemplateRecord(0x9992, [field1, field2])
 

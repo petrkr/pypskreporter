@@ -12,11 +12,12 @@ class OptionsTemplateField:
         self._enum = enterpriseNumber
         self._value = value
 
-    def get_header(self):
+    @property
+    def header(self):
         return pack("!HHI", self._id, self._len, self._enum)
 
-
-    def get_data(self):
+    @property
+    def data(self):
         if self._len != 0xFFFF:
             raise NotImplementedError("Field without variable lenght is not supported")
 
@@ -40,7 +41,7 @@ class OptionsTemplateRecord():
 
         field_data = b""
         for field in self._fields:
-            data = field.get_header()
+            data = field.header
             length += len(data)
             field_data += data
 
@@ -62,7 +63,7 @@ class OptionsTemplateRecord():
 
         field_data = b""
         for field in self._fields:
-            data = field.get_data()
+            data = field.data
             length += len(data)
             field_data += data
 
