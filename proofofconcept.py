@@ -40,7 +40,7 @@ def create_ipfix_header(message_len, sequence = 0, identifier = 0):
 # Return header and data for IPFIX message
 def get_receiver_callsign_record(callsign):
     field = struct.pack("!HHI", PSK_RECEIVER_CALLSIGN | PSK_IPFIX_ENTERPRISEID_BIT, 0xFFFF, PSK_IPFIX_ENTERPRISE_ID)
-    data = struct.pack("!H", len(callsign)) + callsign.encode("utf-8")
+    data = struct.pack("!B", len(callsign)) + callsign.encode("utf-8")
 
     return field, data
 
