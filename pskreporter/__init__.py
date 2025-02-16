@@ -1,5 +1,5 @@
 import struct
-
+import socket
 
 class PSKReporter:
     PSK_REPORTER_SERVER = "report.pskreporter.info"
@@ -29,8 +29,24 @@ class PSKReporter:
     def __init__(self, server = PSK_REPORTER_SERVER, port = PSK_REPORTER_PORT):
         self._server = server
         self._port = port
+        self._reportQueue = []
 
 
     def reporter_seen_callsign(self, remoteInfo, localInfo):
         print(remoteInfo)
         print(localInfo)
+
+        self._reportQueue.append((remoteInfo, localInfo))
+
+
+    def _send_psk_report(self):
+        """
+        Sends a reception reports to PSK Reporter.
+        """
+
+        data = b""
+
+        server_address = (self._server, self._port)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(data, server_address)
+        sock.close()
