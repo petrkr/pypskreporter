@@ -1,110 +1,170 @@
 from struct import pack
 from time import time
 
+IPFIX_MESSAGE_VERSION = 0x0A
 IPFIX_SETID_TEMPLATE_RECORD = 0x02
 IPFIX_SETID_OPTIONS_TEMPLATE_RECORD = 0x03
 
 
+class DataRecord:
+    def __init__(self):
+        self._records = b''
+
+
+    def add_value(self, value, dynamic_length = True):
+        record = b''
+
+        if not dynamic_length:
+            raise NotImplementedError("Only dynamic length record is supported for now")
+
+        if type(value) == str:
+            value = value.encode("UTF-8")
+
+        if len(value) < 255:
+            record += pack("!B", len(value))
+        else:
+            record += pack("!BH", 0xFF, len(value))
+
+        record += value
+        self._records += record
+
+
+    @property
+    def record(self):
+        return self._records
+
+
+class DataRecordSet:
+    def __init__(self, templateid):
+        self._templateid = templateid
+        self._records = b''
+        self._length = 4 # Tempalte ID + lenght itself
+
+
+    def add_record(self, data):
+        self._length += len(data.record)
+        self._records += data.record
+
+
+    @property
+    def data(self):
+        length = self._length
+        padding = b'\x00' * 2
+        length += 2
+
+        header = pack("!HH", self._templateid, length)
+
+        return header + self._records + padding
+
+
 class OptionsTemplateField:
-    def __init__(self, fieldId, length, enterpriseNumber, value):
+    def __init__(self, fieldId, length, enterpriseNumber):
         self._id = fieldId
         self._len = length
         self._enum = enterpriseNumber
-        self._value = value
 
     @property
     def header(self):
         return pack("!HHI", self._id, self._len, self._enum)
 
-    @property
-    def data(self):
-        if self._len != 0xFFFF:
-            raise NotImplementedError("Field without variable lenght is not supported")
 
-        if len(self._value) < 255:
-            return pack("!B", len(self._value)) + self._value
-
-        return pack("!BH", 255, len(self._value)) + self._value
-
-
-class OptionsTemplateRecord():
+class OptionsTemplateRecord:
     def __init__(self, templateId, templateFields = [], scope = 1):
         self._templateId = templateId
-        self._fields = templateFields
         self._scope = scope
+
+        self._fieldsdata = b''
+        self._fieldsnum = 0
+
+        # Size of header + size of record set
+        self._length = 10
+
+        for field in [f.header for f in templateFields]:
+            print(f"Add field {len(field)}")
+            self._length += len(field)
+            self._fieldsdata += field
+            self._fieldsnum += 1
 
 
     def add_field(self, field):
-        self._fields.append(field)
+        header = field.header
+
+        self._length += len(header)
+        self._fieldsnum += 1
+        self._fieldsdata += header
 
 
     def _generate_header(self):
-        length = 0
-        length += 4 # Size of header
-        length += 6 # Size of record set
+        length = self._length
 
-        field_data = b""
-        for field in self._fields:
-            data = field.header
-            length += len(data)
-            field_data += data
+        padding = b'\x00' * 2
+        length += 2
 
         # Header
         record = pack("!HH", IPFIX_SETID_OPTIONS_TEMPLATE_RECORD, length)
 
         # Options template header
-        record += pack("!HHH", self._templateId, len(self._fields), self._scope)
+        record += pack("!HHH", self._templateId, self._fieldsnum, self._scope)
 
         # Fields
-        record += field_data
+        record += self._fieldsdata
+
+        # Padding
+        record += padding
 
         return record
 
-
-    def _generate_data(self):
-        length = 0
-        length += 4 # Size of header
-
-        field_data = b""
-        for field in self._fields:
-            data = field.data
-            length += len(data)
-            field_data += data
-
-        # Data record header
-        record = pack("!HH", self._templateId, length)
-
-        # Field data
-        record += field_data
-
-        return record
-
-
-    @property
-    def header(self):
-        return self._generate_header()
-    
 
     @property
     def data(self):
-        return self._generate_data()
+        return self._generate_header()
+
+
+class IPFIXHeader:
+    def __init__(self, length, sequence = 0, observation = 0, exporttime=None):
+        self._length = length
+        self._seq = sequence
+        self._obid = observation
+        self._time = exporttime
+
+
+    def _generate_header(self):
+        # Version number + Length + Export time + Seq + Observ
+        self._length += 16 # Version number
+        exporttime = self._time
+
+        if not exporttime:
+            exporttime = time()
+
+        # Header
+        record = pack("!HHIII", IPFIX_MESSAGE_VERSION, self._length, int(exporttime), self._seq, self._obid)
+
+        return record
+
+    @property
+    def data(self):
+        return self._generate_header()
 
 
 class IPFIX:
     def __init__(self):
-        self.fields = []
-        self.data = b""
-        self.message = b""
-        self._message = b""
+        self._header = None
+        self._sets = []
 
 
-    def _create_ipfix_header(self, timestamp = None, sequence = 0, identifier = 0):
-        length = len(self._message)
-        length += 16 # Add the length of the IPFIX header
+    def add_set(self, setrecord):
+        self._sets.append(setrecord)
 
-        if timestamp is None:
-            timestamp = time()
 
-        return struct.pack("!HHIII", 10, length, int(timestamp), sequence, identifier)
+    @property
+    def data(self):
+        data = b''
+        length = 0
 
-    
+        for s in self._sets:
+            length += len(s.data)
+            data += s.data
+
+        header = IPFIXHeader(length).data
+
+        return header + data
