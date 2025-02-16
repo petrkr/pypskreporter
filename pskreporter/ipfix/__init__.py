@@ -56,8 +56,10 @@ class DataRecordSet:
     @property
     def data(self):
         length = self._length
-        padding = b'\x00' * 2
-        length += 2
+
+        # Align DataRecordSet to 4 bytes
+        padding = b'\x00' * (-1 * self._length % 4)
+        length += len(padding)
 
         header = pack("!HH", self._templateid, length)
 
