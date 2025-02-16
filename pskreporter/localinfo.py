@@ -1,5 +1,5 @@
 class LocalInfo:
-    def __init__(self, callsign, grid, program_id, program_version, latlng = None, antenna = None):
+    def __init__(self, callsign, grid, program_name, program_version, latlng = None, antenna = None):
         self._callsign = callsign
         self._grid = grid
         self._latlng = latlng
@@ -9,13 +9,13 @@ class LocalInfo:
         if grid_lonlat:
             self._grid = grid_lonlat
 
-        self._program_id = program_id
+        self._program_name = program_name
         self._program_version = program_version
         self._antenna = antenna
 
 
     def __str__(self):
-        return f"LocalInfo(callsign = {self._callsign}, grid = {self._grid}, latlng = {self._latlng}, antenna = {self._antenna}, program_id = {self._program_id}, program_version = {self._program_version})"
+        return f"LocalInfo(callsign = {self._callsign}, grid = {self._grid}, latlng = {self._latlng}, antenna = {self._antenna}, program_name = {self._program_name}, program_version = {self._program_version})"
 
 
     def __repr__(self):
@@ -29,6 +29,7 @@ class LocalInfo:
         # TODO: Implement this, for now return None
         return None
 
+
     @property
     def callsign(self):
         return self._callsign
@@ -38,8 +39,8 @@ class LocalInfo:
         return self._grid
 
     @property
-    def program_id(self):
-        return self._program_id
+    def program_name(self):
+        return self._program_name
 
     @property
     def program_version(self):
