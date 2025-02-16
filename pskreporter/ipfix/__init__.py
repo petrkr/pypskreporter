@@ -56,14 +56,17 @@ class DataRecordSet:
 
 
 class OptionsTemplateField:
-    def __init__(self, fieldId, length, enterpriseNumber):
+    def __init__(self, fieldId, length, enterpriseNumber = None):
         self._id = fieldId
         self._len = length
         self._enum = enterpriseNumber
 
     @property
     def header(self):
-        return pack("!HHI", self._id, self._len, self._enum)
+        if self._enum:
+            return pack("!HHI", self._id, self._len, self._enum)
+        else:
+            return pack("!HH", self._id, self._len)
 
 
 class OptionsTemplateRecord:
