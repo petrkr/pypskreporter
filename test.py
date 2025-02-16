@@ -43,7 +43,6 @@ def main():
     field_snr = OptionsTemplateField(PSKReporter.SNR, 0xFFFF, 0x0000768F)
     field_time = OptionsTemplateField(150, 4)
 
-
     print(f"Receivercall field: {field_receivercall.header}")
     print(f"Receivergrid field: {field_receivergrid.header}")
     print(f"Decodersw field: {field_decodersw.header}")
@@ -54,29 +53,31 @@ def main():
     print(f"Time field: {field_time.header}")
 
     # Define template based on fields
-    template1 = OptionsTemplateRecord(0x9992)
+    template1 = OptionsTemplateRecord(PSKReporter.RECEIVER_ID)
     template1.add_field(field_receivercall)
     template1.add_field(field_receivergrid)
     template1.add_field(field_decodersw)
 
     # Define template based on fields
-    template2 = OptionsTemplateRecord(0x9993)
+    template2 = OptionsTemplateRecord(PSKReporter.SENDER_ID)
     template2.add_field(field_sendercall)
     template2.add_field(field_sendergrid)
     template2.add_field(field_snr)
     template2.add_field(field_time)
 
+
     print(f"Template1 record: {template1.data}")
     print(f"Template2 record: {template2.data}")
 
     # Add values to template 0x9992
-    dataset1 = DataRecordSet(0x9992)
-    dataset2 = DataRecordSet(0x9993)
+    dataset1 = DataRecordSet(PSKReporter.RECEIVER_ID)
+    dataset2 = DataRecordSet(PSKReporter.SENDER_ID)
 
     # Create one data record
     record1 = DataRecord()
     record1.add_value("TESTCALL-1")
-    record1.add_value("JO70FC")
+    record1.add_value() # Empty field
+    #record1.add_value("JO70FC")
     record1.add_value("PyPSK Reporter v0.0.1")
 
     record2 = DataRecord()
