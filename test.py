@@ -30,46 +30,71 @@ def main():
     pskr.reporter_seen_callsign(remote, local)
 
     # Define template fields
-    field_receivercall = OptionsTemplateField(0x8002, 0xFFFF, 0x0000768F)
-    field_receivergrid = OptionsTemplateField(0x8004, 0xFFFF, 0x0000768F)
+    field_receivercall = OptionsTemplateField(PSKReporter.RECEIVER_CALLSIGN, 0xFFFF, 0x0000768F)
+    field_receivergrid = OptionsTemplateField(PSKReporter.RECEIVER_LOCATOR, 0xFFFF, 0x0000768F)
+    field_decodersw = OptionsTemplateField(PSKReporter.DECODER_SOFTWARE, 0xFFFF, 0x0000768F)
+
+    field_sendercall = OptionsTemplateField(PSKReporter.SENDER_CALLSIGN, 0xFFFF, 0x0000768F)
+    field_sendergrid = OptionsTemplateField(PSKReporter.SENDER_LOCATOR, 0xFFFF, 0x0000768F)
+    field_snr = OptionsTemplateField(PSKReporter.SNR, 0xFFFF, 0x0000768F)
 
     print(f"Receivercall field: {field_receivercall.header}")
     print(f"Receivergrid field: {field_receivergrid.header}")
+    print(f"Decodersw field: {field_decodersw.header}")
+
+    print(f"Sendercall field: {field_sendercall.header}")
+    print(f"Sendergrid field: {field_sendergrid.header}")
+    print(f"Sendergrid field: {field_snr.header}")
 
     # Define template based on fields
-    template = OptionsTemplateRecord(0x9992, [field_receivercall])
-    template.add_field(field_receivergrid)
+    template1 = OptionsTemplateRecord(0x9992)
+    template1.add_field(field_receivercall)
+    template1.add_field(field_receivergrid)
+    template1.add_field(field_decodersw)
 
-    print(f"Template record: {template.data}")
+    # Define template based on fields
+    template2 = OptionsTemplateRecord(0x9993)
+    template2.add_field(field_sendercall)
+    template2.add_field(field_sendergrid)
+    template2.add_field(field_snr)
+
+    print(f"Template1 record: {template1.data}")
+    print(f"Template2 record: {template2.data}")
 
     # Add values to template 0x9992
-    dataset = DataRecordSet(0x9992)
+    dataset1 = DataRecordSet(0x9992)
+    dataset2 = DataRecordSet(0x9993)
 
     # Create one data record
     record1 = DataRecord()
     record1.add_value("TESTCALL-1")
     record1.add_value("JO70FC")
+    record1.add_value("PyPSK Reporter v0.0.1")
 
     record2 = DataRecord()
     record2.add_value("TESTCALL-2")
     record2.add_value("JO70QM")
+    record2.add_value(-27)
 
     print(f"Record 1: {record1.record}")
     print(f"Record 2: {record2.record}")
 
     # Add records to dataset
-    dataset.add_record(record1)
-    dataset.add_record(record2)
+    dataset1.add_record(record1)
+    dataset2.add_record(record2)
 
-    print (f"Record Data set: {dataset.data}")
+    print (f"Record Data set: {dataset1.data}")
+    print (f"Record Data set: {dataset2.data}")
 
     payload = IPFIX()
 
-    # Add field template
-    payload.add_set(template)
+    # Add templates
+    payload.add_set(template1)
+    payload.add_set(template2)
 
     # Add data for this tempalte
-    payload.add_set(dataset)
+    payload.add_set(dataset1)
+    payload.add_set(dataset2)
 
     # whole IPFix packet
     print(f"Whole IPFIX packet ({len(payload.data)}): {payload.data}")
