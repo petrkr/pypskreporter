@@ -4,7 +4,7 @@ from pskreporter import PSKReporter
 from pskreporter.remoteinfo import RemoteInfo
 from pskreporter.localinfo import LocalInfo
 
-from pskreporter.ipfix import OptionsTemplateField, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
+from pskreporter.ipfix import FieldSpecifierFormat, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
 from struct import pack
 
 from time import time
@@ -34,15 +34,15 @@ def main():
     pskr.reporter_seen_callsign(remote, local)
 
     # Define template fields
-    field_receivercall = OptionsTemplateField(PSKReporter.RECEIVER_CALLSIGN, 0xFFFF, 0x0000768F)
-    field_receivergrid = OptionsTemplateField(PSKReporter.RECEIVER_LOCATOR, 0xFFFF, 0x0000768F)
-    field_decodersw = OptionsTemplateField(PSKReporter.DECODER_SOFTWARE, 0xFFFF, 0x0000768F)
+    field_receivercall = FieldSpecifierFormat(PSKReporter.RECEIVER_CALLSIGN, 0xFFFF, 0x0000768F)
+    field_receivergrid = FieldSpecifierFormat(PSKReporter.RECEIVER_LOCATOR, 0xFFFF, 0x0000768F)
+    field_decodersw = FieldSpecifierFormat(PSKReporter.DECODER_SOFTWARE, 0xFFFF, 0x0000768F)
 
-    field_sendercall = OptionsTemplateField(PSKReporter.SENDER_CALLSIGN, 0xFFFF, 0x0000768F)
-    field_sendergrid = OptionsTemplateField(PSKReporter.SENDER_LOCATOR, 0xFFFF, 0x0000768F)
-    field_snr = OptionsTemplateField(PSKReporter.SNR, 0xFFFF, 0x0000768F)
-    field_imd = OptionsTemplateField(PSKReporter.IMD, 0xFFFF, 0x0000768F)
-    field_time = OptionsTemplateField(150, 4)
+    field_sendercall = FieldSpecifierFormat(PSKReporter.SENDER_CALLSIGN, 0xFFFF, 0x0000768F)
+    field_sendergrid = FieldSpecifierFormat(PSKReporter.SENDER_LOCATOR, 0xFFFF, 0x0000768F)
+    field_snr = FieldSpecifierFormat(PSKReporter.SNR, 0xFFFF, 0x0000768F)
+    field_imd = FieldSpecifierFormat(PSKReporter.IMD, 0xFFFF, 0x0000768F)
+    field_time = FieldSpecifierFormat(150, 4)
 
     print(f"Receivercall field: {field_receivercall.header}")
     print(f"Receivergrid field: {field_receivergrid.header}")

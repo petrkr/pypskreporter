@@ -1,6 +1,6 @@
 import struct
 import socket
-from pskreporter.ipfix import IPFIX, OptionsTemplateField
+from pskreporter.ipfix import IPFIX, FieldSpecifierFormat
 
 class PSKReporter:
     PSK_REPORTER_SERVER = "report.pskreporter.info"

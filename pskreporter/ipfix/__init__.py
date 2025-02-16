@@ -66,7 +66,7 @@ class DataRecordSet:
         return header + self._records + padding
 
 
-class OptionsTemplateField:
+class FieldSpecifierFormat:
     def __init__(self, fieldId, length, enterpriseNumber = None):
         self._id = fieldId
         self._len = length
