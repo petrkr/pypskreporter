@@ -6,6 +6,13 @@ class PSKReporter:
     PSK_REPORTER_SERVER = "report.pskreporter.info"
     PSK_REPORTER_PORT = 14739 # TODO: Change to prod port when library is ready, Default dev port for now
 
+    # PSK Reporter Information Sources
+    REPORTER_SOURCE_AUTOMATIC = 0x01
+    REPORTER_SOURCE_LOG = 0x02
+    REPORTER_SOURCE_MANUAL = 0x03
+    REPORTER_SOURCE_TENTATIVE = 0x40
+    REPORTER_SOURCE_TEST = 0x80
+
     # PSK Reporter Template IDs
     RECEIVER_ID = 0x9992
     SENDER_ID = 0x9993
