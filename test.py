@@ -7,6 +7,8 @@ from pskreporter.localinfo import LocalInfo
 from pskreporter.ipfix import OptionsTemplateField, OptionsTemplateRecord, DataRecord, DataRecordSet, IPFIX
 from struct import pack
 
+from time import time
+
 
 def send_psk_report(ipfx_message):
     """
@@ -39,6 +41,8 @@ def main():
     field_sendercall = OptionsTemplateField(PSKReporter.SENDER_CALLSIGN, 0xFFFF, 0x0000768F)
     field_sendergrid = OptionsTemplateField(PSKReporter.SENDER_LOCATOR, 0xFFFF, 0x0000768F)
     field_snr = OptionsTemplateField(PSKReporter.SNR, 0xFFFF, 0x0000768F)
+    field_time = OptionsTemplateField(150, 4)
+
 
     print(f"Receivercall field: {field_receivercall.header}")
     print(f"Receivergrid field: {field_receivergrid.header}")
@@ -47,6 +51,7 @@ def main():
     print(f"Sendercall field: {field_sendercall.header}")
     print(f"Sendergrid field: {field_sendergrid.header}")
     print(f"Sendergrid field: {field_snr.header}")
+    print(f"Time field: {field_time.header}")
 
     # Define template based on fields
     template1 = OptionsTemplateRecord(0x9992)
@@ -59,6 +64,7 @@ def main():
     template2.add_field(field_sendercall)
     template2.add_field(field_sendergrid)
     template2.add_field(field_snr)
+    template2.add_field(field_time)
 
     print(f"Template1 record: {template1.data}")
     print(f"Template2 record: {template2.data}")
@@ -77,11 +83,13 @@ def main():
     record2.add_value("TESTCALL-2")
     record2.add_value("JO70QM")
     record2.add_value(pack("!b", -15))
+    record2.add_value(pack("!I", int(time())), False)
 
     record3 = DataRecord()
     record3.add_value("TESTCALL-3")
     record3.add_value("JO70FC")
     record3.add_value(pack("!b", -2))
+    record3.add_value(pack("!I", int(time())), False)
 
     print(f"Record 1: {record1.record}")
     print(f"Record 2: {record2.record}")
