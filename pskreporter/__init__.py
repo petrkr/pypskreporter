@@ -49,8 +49,8 @@ class PSKReporter:
         self._reportQueue.append((remoteInfo, localInfo))
 
 
-    def _ipfix_receiver_callsign(self, callsign):
-        field = OptionsTemplateField(RECEIVER_CALLSIGN, 0xFFFF, ENTERPRISE_ID, callsign)
+    def _ipfix_receiver_callsign(self):
+        field = OptionsTemplateField(self.RECEIVER_CALLSIGN, 0xFFFF, self.ENTERPRISE_ID)
 
         return field
 
