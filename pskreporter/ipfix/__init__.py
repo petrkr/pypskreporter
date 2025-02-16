@@ -11,8 +11,17 @@ class DataRecord:
         self._records = b''
 
 
-    def add_value(self, value, dynamic_length = True):
+    def add_value(self, value = None, dynamic_length = True):
         record = b''
+
+        if not value and not dynamic_length:
+            raise ValueError("Value must be set for fixed fields")
+
+        # Empty dynamic field, just fill zero length
+        if not value:
+            self._records += b'\x00'
+            return
+
 
         if type(value) == str:
             value = value.encode("UTF-8")
